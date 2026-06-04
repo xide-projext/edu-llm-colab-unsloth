@@ -29,6 +29,8 @@ Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하�
 > 📖 각 기술을 **왜·언제·무엇을 조절하나(vibe learning)** 관점으로 정리한 학습 문서: **[docs/LEARNING.md](docs/LEARNING.md)**
 > — 입문자는 이 문서의 *큰 그림*과 *치트시트*부터 보세요.
 >
+> 🧭 **파인튜닝 방법 선택 사고법** — Unsloth의 여러 방법(SFT·CPT·DPO·GRPO 등) 중 *왜 그것인가*를 가설로 먼저 생각하게 가르치는 문서: **[docs/METHOD_SELECTION.md](docs/METHOD_SELECTION.md)**
+>
 > 🧩 시나리오를 **새로 만들거나 고를 때** 필요한 최소 정보·데이터셋 검색·등록 절차: **[docs/SCENARIO_GUIDE.md](docs/SCENARIO_GUIDE.md)**
 >
 > 📑 **실험 보고서(논문 규격)** — 시나리오 1 사례: 문제 정형화·가설(H1–H3)·데이터 선택 원리·QLoRA SFT·평가 프로토콜(IAR/SQR/ALR/RPS, McNemar/bootstrap)·재현성: **[docs/CASE_STUDY_scenario1_socratic.md](docs/CASE_STUDY_scenario1_socratic.md)**
