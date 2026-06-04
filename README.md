@@ -30,6 +30,8 @@ Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하�
 > — 입문자는 이 문서의 *큰 그림*과 *치트시트*부터 보세요.
 >
 > 🧩 시나리오를 **새로 만들거나 고를 때** 필요한 최소 정보·데이터셋 검색·등록 절차: **[docs/SCENARIO_GUIDE.md](docs/SCENARIO_GUIDE.md)**
+>
+> 📑 **간이 기술 보고서(예시)** — 시나리오 1로 보는 "문제 정의→데이터 선택→파인튜닝→결과 검증": **[docs/CASE_STUDY_scenario1_socratic.md](docs/CASE_STUDY_scenario1_socratic.md)**
 
 ---
 

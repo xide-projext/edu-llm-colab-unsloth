@@ -56,7 +56,12 @@ cells = [
     code(
         "import os, sys",
         'os.environ["MPLBACKEND"] = "agg"   # 안전하게 한 번 더 고정',
-        'sys.path.insert(0, "/content/unsloth/studio/backend")',
+        'BACKEND = "/content/unsloth/studio/backend"',
+        "# 자가 점검: setup(1번 셀)을 안 돌렸으면 colab 모듈을 못 찾음",
+        "if not os.path.isdir(BACKEND):",
+        "    raise RuntimeError(\"❌ 먼저 1번 'Setup' 셀을 실행하세요. (/content/unsloth 가 없습니다)\")",
+        "if BACKEND not in sys.path:",
+        "    sys.path.insert(0, BACKEND)   # 'No module named colab' 방지",
         "from colab import start",
         "start()",
     ),
