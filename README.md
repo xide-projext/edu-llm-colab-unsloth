@@ -34,6 +34,10 @@ Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하�
 > 🧩 시나리오를 **새로 만들거나 고를 때** 필요한 최소 정보·데이터셋 검색·등록 절차: **[docs/SCENARIO_GUIDE.md](docs/SCENARIO_GUIDE.md)**
 >
 > 📑 **실험 보고서(논문 규격)** — 시나리오 1 사례: 문제 정형화·가설(H1–H3)·데이터 선택 원리·QLoRA SFT·평가 프로토콜(IAR/SQR/ALR/RPS, McNemar/bootstrap)·재현성: **[docs/CASE_STUDY_scenario1_socratic.md](docs/CASE_STUDY_scenario1_socratic.md)**
+>
+> 🧪 **Gemma 4 (E2B) Before→After 워크스루** — 결함 재현→파인튜닝→검증 + 기술 선택 내비게이션: **[docs/SOCRATIC_GEMMA4_WALKTHROUGH.md](docs/SOCRATIC_GEMMA4_WALKTHROUGH.md)** (노트북 `socratic_gemma4_before_after.ipynb`)
+>
+> 📚 **시나리오별 데이터셋 설명** — 16개 소스의 매핑·필드·라이선스: **[docs/DATASETS.md](docs/DATASETS.md)**
 
 ---
 
@@ -58,8 +62,9 @@ edu-llm-colab-unsloth/
 ├── README.md
 ├── requirements.txt
 ├── notebooks/
-│   ├── unsloth_edu_finetune.ipynb   # ⭐ 메인 Colab 파인튜닝 노트북 (코드 기반, 재현용)
-│   └── unsloth_studio_ui.ipynb      # 🖥️ Unsloth Studio 웹 UI 띄우기 (노코드 체험용)
+│   ├── unsloth_edu_finetune.ipynb       # ⭐ 메인 Colab 파인튜닝 (코드 기반, 재현용)
+│   ├── socratic_gemma4_before_after.ipynb # 🧪 Gemma4 E2B 소크라테스 Before→After + 선택 내비게이션
+│   └── unsloth_studio_ui.ipynb          # 🖥️ Unsloth Studio 웹 UI (노코드 체험용)
 ├── data/
 │   ├── scenarios.json               # 20대 교육 시나리오 정의 (선정이유·기대치·dataset 매핑)
 │   ├── seed_train.jsonl             # 시나리오별 목표 톤 예시 (참고용, 학습엔 미사용)
