@@ -26,6 +26,9 @@ Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하�
 **전체 흐름**: `Colab(T4)` → `Unsloth`로 `Qwen2.5` 4bit 적재(`bitsandbytes`) → `PEFT(LoRA)` 어댑터 추가 →
 `HF Datasets`에서 교육 데이터 fetch → `TRL SFTTrainer`로 학습 → 추론 테스트 → LoRA/GGUF 저장.
 
+> 📖 각 기술을 **왜·언제·무엇을 조절하나(vibe learning)** 관점으로 정리한 학습 문서: **[docs/LEARNING.md](docs/LEARNING.md)**
+> — 입문자는 이 문서의 *큰 그림*과 *치트시트*부터 보세요.
+
 ---
 
 ## 🚀 빠른 시작 (3단계)
