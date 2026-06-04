@@ -52,7 +52,8 @@ edu-llm-colab-unsloth/
 ├── README.md
 ├── requirements.txt
 ├── notebooks/
-│   └── unsloth_edu_finetune.ipynb   # ⭐ 메인 Colab 파인튜닝 노트북
+│   ├── unsloth_edu_finetune.ipynb   # ⭐ 메인 Colab 파인튜닝 노트북 (코드 기반, 재현용)
+│   └── unsloth_studio_ui.ipynb      # 🖥️ Unsloth Studio 웹 UI 띄우기 (노코드 체험용)
 ├── data/
 │   ├── scenarios.json               # 20대 교육 시나리오 정의 (선정이유·기대치·dataset 매핑)
 │   ├── seed_train.jsonl             # 시나리오별 목표 톤 예시 (참고용, 학습엔 미사용)
@@ -60,8 +61,13 @@ edu-llm-colab-unsloth/
 └── scripts/
     ├── fetch_hf_datasets.py         # ⭐ HF 데이터셋 → 20시나리오 포맷 변환 (16개 소스 레지스트리)
     ├── prepare_dataset.py           # 시드/로컬 데이터 검증·통계·분할
-    └── build_notebook.py            # 노트북(.ipynb) 재생성기
+    ├── build_notebook.py            # 메인 노트북(.ipynb) 재생성기
+    └── build_studio_notebook.py     # Studio UI 노트북 재생성기
 ```
+
+> **두 가지 사용법**
+> - 🖥️ **노코드 체험**: `notebooks/unsloth_studio_ui.ipynb` → Colab에서 Unsloth Studio 웹 UI를 띄워 클릭으로 모델 다운로드·학습
+> - ⚙️ **코드 재현 학습**: `notebooks/unsloth_edu_finetune.ipynb` → 16개 HF 데이터셋을 20시나리오로 변환해 재현 가능하게 학습
 
 ---
 
