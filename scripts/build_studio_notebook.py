@@ -26,13 +26,27 @@ cells = [
     md("## 0. GPU 확인 (T4 인지 확인)"),
     code("!nvidia-smi"),
     md(
+        "## 0.5. 환경 변수 고정 (중요!)",
+        "Colab의 matplotlib **inline 백엔드**가 Studio와 충돌해 시작 시",
+        "`ValueError: ... backend; 'module://matplotlib_inline...'` 에러가 납니다.",
+        "headless 백엔드(`agg`)로 덮어써서 방지합니다. **setup·start 보다 먼저 실행**하세요.",
+    ),
+    code(
+        "import os",
+        '# Studio venv 의 matplotlib 가 Colab inline 백엔드를 못 읽어 죽는 문제 방지',
+        'os.environ["MPLBACKEND"] = "agg"',
+        'print("MPLBACKEND =", os.environ["MPLBACKEND"])',
+    ),
+    md(
         "## 1. Setup — Unsloth 레포 clone & 설치",
         "공식 setup 스크립트를 실행합니다. (수 분 소요, 의존성 설치)",
+        "끝에 'Start Unsloth Studio now?' 자동 실행이 한 번 죽어도(무시 가능) 설치는 완료됩니다 — 2번 셀에서 다시 시작합니다.",
     ),
     code(
         "!git clone --depth 1 --branch main https://github.com/unslothai/unsloth.git",
         "%cd /content/unsloth",
-        "!chmod +x studio/setup.sh && ./studio/setup.sh --local",
+        "# 자동 실행(--local 의 prompt) 충돌을 피하려 MPLBACKEND 를 셸에도 명시",
+        "!chmod +x studio/setup.sh && MPLBACKEND=agg ./studio/setup.sh --local",
     ),
     md(
         "## 2. Studio 시작",
@@ -40,7 +54,8 @@ cells = [
         "실행 후 나오는 **\"Open Unsloth Studio\"** 링크/박스를 클릭하세요.",
     ),
     code(
-        "import sys",
+        "import os, sys",
+        'os.environ["MPLBACKEND"] = "agg"   # 안전하게 한 번 더 고정',
         'sys.path.insert(0, "/content/unsloth/studio/backend")',
         "from colab import start",
         "start()",
@@ -71,6 +86,7 @@ cells = [
     md(
         "---",
         "### 문제 해결",
+        "- **`ValueError: Key backend: 'module://matplotlib_inline...'`**: 0.5번 셀(`MPLBACKEND=agg`)을 먼저 실행했는지 확인. 이미 죽었다면 0.5번 → 2번 순서로 다시 실행.",
         "- **Open 링크가 에러/빈 화면**: 쿠키·애드블록 때문. 2번 셀을 다시 실행하거나, 출력 박스 아래로 스크롤하면 UI가 직접 보입니다. (알려진 버그 unslothai/unsloth#4516)",
         "- **setup.sh 실패**: 1번 셀 로그 확인 후 재실행. 런타임이 **T4 GPU** 인지 다시 확인.",
         "- **OOM**: UI에서 더 작은 모델(0.5B), batch/seq 축소 (LEARNING.md 치트시트).",
