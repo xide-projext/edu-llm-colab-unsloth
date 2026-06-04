@@ -1,9 +1,30 @@
-# 🎓 Yonsei Colab Studio
+# 🎓 edu-llm-colab-unsloth
 
 Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하는 실험 환경입니다.
 [Unsloth](https://github.com/unslothai/unsloth)를 사용해 무료 T4 GPU에서도 OOM 없이 빠르게 학습합니다.
+20가지 교육 시나리오(소크라테스 문답·단계별 채점·독해·코딩 등)를 실제 HuggingFace 데이터셋으로 학습합니다.
 
 > GPT-2가 아니라 더 똑똑한 최신 초경량 모델(Qwen2.5-1.5B / Llama-3.2-1B)을 기본값으로 사용합니다.
+
+---
+
+## 🛠️ 사용 기술 / 도구 (Tech Stack)
+
+| 분류 | 도구 | 역할 |
+|------|------|------|
+| **실행 환경** | [Google Colab](https://colab.research.google.com) | 무료 T4 GPU 클라우드 노트북. 설치 없이 브라우저에서 학습 |
+| **파인튜닝 엔진** | [Unsloth](https://github.com/unslothai/unsloth) | LLM 파인튜닝 최적화 라이브러리. 메모리 ~80%↓·속도 2~3배↑로 무료 GPU에서도 OOM 방지 |
+| **학습 프레임워크** | [TRL](https://github.com/huggingface/trl) (`SFTTrainer`) | 지도학습 파인튜닝(SFT) 트레이너 |
+| **경량 학습 기법** | [PEFT](https://github.com/huggingface/peft) (LoRA/QLoRA) | 전체가 아닌 일부 어댑터만 학습 → 메모리·시간 절약 |
+| **양자화** | [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes) | 4bit 양자화로 모델을 작은 VRAM에 적재 |
+| **모델 백본** | [Transformers](https://github.com/huggingface/transformers) · [Qwen2.5](https://huggingface.co/Qwen) / [Llama-3.2](https://huggingface.co/meta-llama) | 사전학습 초경량 LLM (한국어 우수) |
+| **데이터** | [HuggingFace Datasets](https://github.com/huggingface/datasets) | 한국어 교육 데이터셋을 streaming으로 추출·변환 |
+| **데이터 소스 관리** | `scripts/fetch_hf_datasets.py` | 16개 HF 데이터셋 → 20시나리오 통합 포맷 변환 (자체 레지스트리) |
+| **버전 관리/배포** | Git · GitHub (`gh`) | 코드/노트북 관리, Colab에서 clone |
+| **내보내기(선택)** | GGUF → [Ollama](https://ollama.com) / [LM Studio](https://lmstudio.ai) / llama.cpp | 학습한 모델을 로컬 추론 엔진에서 사용 |
+
+**전체 흐름**: `Colab(T4)` → `Unsloth`로 `Qwen2.5` 4bit 적재(`bitsandbytes`) → `PEFT(LoRA)` 어댑터 추가 →
+`HF Datasets`에서 교육 데이터 fetch → `TRL SFTTrainer`로 학습 → 추론 테스트 → LoRA/GGUF 저장.
 
 ---
 
@@ -14,24 +35,28 @@ Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하�
 2. 상단 메뉴 **런타임 → 런타임 유형 변경 → T4 GPU** 선택
 3. **런타임 → 모두 실행** (Run all)
 
-데이터는 노트북 2번 셀에서 `git clone` 하거나 `train.jsonl`을 직접 업로드합니다.
+노트북이 자동으로 이 저장소를 clone하고 HuggingFace에서 학습 데이터를 받습니다:
+```bash
+git clone https://github.com/xide-projext/edu-llm-colab-unsloth.git
+```
 
 ---
 
 ## 📁 구조
 
 ```
-yonsei-colab-studio/
+edu-llm-colab-unsloth/
 ├── README.md
 ├── requirements.txt
 ├── notebooks/
 │   └── unsloth_edu_finetune.ipynb   # ⭐ 메인 Colab 파인튜닝 노트북
 ├── data/
-│   ├── scenarios.json               # 20대 교육 시나리오 정의 (선정이유·기대치 포함)
-│   ├── seed_train.jsonl             # 시나리오별 시드 학습 데이터 (직접 늘려가세요)
-│   ├── train.jsonl / val.jsonl      # prepare_dataset.py 가 생성
+│   ├── scenarios.json               # 20대 교육 시나리오 정의 (선정이유·기대치·dataset 매핑)
+│   ├── seed_train.jsonl             # 시나리오별 목표 톤 예시 (참고용, 학습엔 미사용)
+│   └── hf_train.jsonl               # fetch_hf_datasets.py 가 HF에서 생성 (gitignore)
 └── scripts/
-    ├── prepare_dataset.py           # 검증·통계·train/val 분할
+    ├── fetch_hf_datasets.py         # ⭐ HF 데이터셋 → 20시나리오 포맷 변환 (16개 소스 레지스트리)
+    ├── prepare_dataset.py           # 시드/로컬 데이터 검증·통계·분할
     └── build_notebook.py            # 노트북(.ipynb) 재생성기
 ```
 
