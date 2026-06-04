@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""notebooks/unsloth_studio_ui.ipynb 생성 — 코랩에서 Unsloth Studio UI 띄우기 (방법 B)."""
+"""notebooks/unsloth_studio_ui.ipynb 생성 — 코랩에서 Unsloth Studio UI 띄우기.
+
+공식 Colab 방식(unslothai/unsloth/studio/Unsloth_Studio_Colab.ipynb)을 그대로 따른다:
+  - curl install.sh (로컬용) 가 아니라, 레포 clone + studio/setup.sh --local
+  - 포트 노출은 studio backend 의 colab.start() 가 자동 처리
+"""
 import json
 from pathlib import Path
 
@@ -11,83 +16,65 @@ cells = [
         "# 🖥️ Unsloth Studio UI on Colab (노코드)",
         "",
         "코랩에서 **Unsloth Studio 웹 UI**를 띄워 클릭만으로 모델을 받고 파인튜닝합니다.",
-        "코드로 재현하는 학습은 `unsloth_edu_finetune.ipynb` 를 쓰세요. 이건 **빠른 체험용**입니다.",
+        "**공식 Colab 방식** 그대로입니다 (unslothai/unsloth/studio).",
         "",
-        "> ⚠️ 먼저 **런타임 → 런타임 유형 변경 → T4 GPU** 선택!",
+        "> ⚠️ 먼저 **런타임 → 런타임 유형 변경 → T4 GPU** 선택 후 **런타임 → 모두 실행**!",
         "",
-        "참고: 가짜 정보 주의 — Studio는 `pip install unsloth-studio` 가 **아니라** 공식 설치 스크립트로 깔고,",
-        "`unsloth studio` 명령으로 실행합니다. (port 8888)",
+        "참고: `pip install unsloth-studio` 나 `curl install.sh` 는 코랩용이 **아닙니다**.",
+        "코랩에서는 아래처럼 레포를 clone하고 `setup.sh` → `colab.start()` 로 띄웁니다.",
     ),
-    md("## 0. GPU 확인"),
+    md("## 0. GPU 확인 (T4 인지 확인)"),
     code("!nvidia-smi"),
     md(
-        "## 1. Unsloth Studio 설치",
-        "공식 설치 스크립트 사용 (MacOS/Linux/WSL/Colab 공통). 1~2분 소요.",
+        "## 1. Setup — Unsloth 레포 clone & 설치",
+        "공식 setup 스크립트를 실행합니다. (수 분 소요, 의존성 설치)",
     ),
     code(
-        "!curl -fsSL https://unsloth.ai/install.sh | sh",
+        "!git clone --depth 1 --branch main https://github.com/unslothai/unsloth.git",
+        "%cd /content/unsloth",
+        "!chmod +x studio/setup.sh && ./studio/setup.sh --local",
     ),
     md(
-        "## 2. Studio 서버 실행 (백그라운드, port 8888)",
-        "서버를 백그라운드로 띄우고 기동될 때까지 잠시 기다립니다.",
+        "## 2. Studio 시작",
+        "`start()` 가 서버 실행 + 포트 노출(Open 버튼)을 자동으로 처리합니다.",
+        "실행 후 나오는 **\"Open Unsloth Studio\"** 링크/박스를 클릭하세요.",
     ),
     code(
-        "import subprocess, time, os",
-        "",
-        "# 로그를 파일로 남기며 백그라운드 실행",
-        "logf = open('studio.log', 'w')",
-        "proc = subprocess.Popen(",
-        '    ["unsloth", "studio", "-H", "0.0.0.0", "-p", "8888"],',
-        "    stdout=logf, stderr=subprocess.STDOUT,",
-        ")",
-        "print('Studio 서버 기동 중... (PID', proc.pid, ')')",
-        "time.sleep(25)   # 서버 준비 대기",
-        "print('--- studio.log (마지막 20줄) ---')",
-        "!tail -n 20 studio.log",
+        "import sys",
+        'sys.path.insert(0, "/content/unsloth/studio/backend")',
+        "from colab import start",
+        "start()",
     ),
     md(
-        "## 3. UI 열기 — 포트 8888 노출",
-        "코랩 내장 기능으로 포트를 노출합니다. **외부 터널(ngrok/localtunnel) 불필요.**",
-        "아래 셀 실행 후 나오는 링크/창에서 Studio UI가 열립니다.",
-    ),
-    code(
-        "from google.colab.output import serve_kernel_port_as_window, serve_kernel_port_as_iframe",
-        "",
-        "# (A) 새 창으로 열기 (권장)",
-        "serve_kernel_port_as_window(8888)",
-        "",
-        "# (B) 노트북 안에 iframe으로 보고 싶으면 위 줄 대신 아래 사용:",
-        "# serve_kernel_port_as_iframe(8888, height=800)",
-    ),
-    md(
-        "## 4. UI에서 모델 다운로드 & 학습",
+        "## 3. UI에서 모델 다운로드 & 학습",
         "",
         "열린 Studio 화면에서:",
         "1. **모델 선택칸**에 HuggingFace 모델명 입력 → 자동 다운로드",
         "   - 추천(초경량): `unsloth/Qwen2.5-1.5B-Instruct`, `unsloth/Qwen2.5-0.5B-Instruct`, `unsloth/Llama-3.2-1B-Instruct`",
-        "2. **데이터** 업로드 (CSV/JSONL) — 우리 레포 데이터를 쓰려면 아래 셀로 먼저 받으세요.",
-        "3. LoRA/하이퍼파라미터 조정 후 **Train** → **Model Arena**로 비교 → **Export**(GGUF 등).",
+        "2. **데이터** 업로드(CSV/JSONL). 우리 20시나리오 데이터를 쓰려면 아래 4번 셀로 먼저 생성.",
+        "3. LoRA/하이퍼파라미터 조정 → **Train** → **Model Arena** 비교 → **Export**(GGUF 등).",
         "",
-        "각 설정의 의미·조절법은 레포의 `docs/LEARNING.md` 치트시트를 참고하세요.",
+        "각 설정의 의미·조절법은 레포의 `docs/LEARNING.md` 치트시트 참고.",
+    ),
+    md(
+        "## 4. (선택) 우리 레포 20시나리오 데이터 생성 → UI에 업로드",
+        "Studio UI의 데이터 업로드칸에 넣을 `hf_train.jsonl` 을 만듭니다.",
     ),
     code(
-        "# (선택) 우리 레포의 20시나리오 학습 데이터 받아서 Studio에 업로드용으로 준비",
-        "REPO = 'https://github.com/xide-projext/edu-llm-colab-unsloth.git'",
-        "import os",
-        "if not os.path.exists('edu-llm-colab-unsloth'):",
-        "    !git clone -q $REPO",
-        "%cd edu-llm-colab-unsloth",
+        "%cd /content",
+        "!git clone -q https://github.com/xide-projext/edu-llm-colab-unsloth.git",
+        "%cd /content/edu-llm-colab-unsloth",
         "!pip install -q datasets",
         "!python scripts/fetch_hf_datasets.py --per-source 2000 --val-ratio 0.05",
-        "print('생성됨: data/hf_train.jsonl → Studio UI에서 이 파일을 업로드하세요')",
+        'print("생성됨: /content/edu-llm-colab-unsloth/data/hf_train.jsonl → 좌측 파일탭에서 다운로드 후 Studio UI에 업로드")',
     ),
     md(
         "---",
         "### 문제 해결",
-        "- **Open 링크가 에러**: 쿠키/애드블록 때문. 3번 셀을 다시 실행하거나 iframe(B) 방식 사용.",
-        "- **서버가 안 뜸**: `!tail -n 50 studio.log` 로 로그 확인. 설치(1번) 재실행.",
-        "- **OOM**: 더 작은 모델(0.5B) 선택, batch/seq 축소 (LEARNING.md 치트시트).",
-        "- 코드 기반 재현 학습이 필요하면 `unsloth_edu_finetune.ipynb` 사용.",
+        "- **Open 링크가 에러/빈 화면**: 쿠키·애드블록 때문. 2번 셀을 다시 실행하거나, 출력 박스 아래로 스크롤하면 UI가 직접 보입니다. (알려진 버그 unslothai/unsloth#4516)",
+        "- **setup.sh 실패**: 1번 셀 로그 확인 후 재실행. 런타임이 **T4 GPU** 인지 다시 확인.",
+        "- **OOM**: UI에서 더 작은 모델(0.5B), batch/seq 축소 (LEARNING.md 치트시트).",
+        "- **코드로 재현 학습**: UI 대신 `unsloth_edu_finetune.ipynb` 사용 (권장 — 재현·버전관리).",
     ),
 ]
 
