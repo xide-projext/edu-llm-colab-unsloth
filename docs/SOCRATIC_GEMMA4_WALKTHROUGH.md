@@ -18,6 +18,47 @@
 
 ---
 
+## ✅ 핵심 4문답 (시작 전 반드시 답하기)
+
+파인튜닝을 시작하기 전, 이 네 질문에 답이 있어야 한다. (노트북 셀 번호와 1:1 대응)
+
+### Q1. 모델(학습 전)은 무엇으로 할 것인가?
+**`unsloth/gemma-4-E2B-it`** (Gemma 4, effective 2B, **instruct**).
+- 왜 이것: ① E2B는 초경량이라 **무료 Colab T4**에서 학습 가능, ② **instruct** 버전이라 대화·지시는 이미 알지만 *소크라테스 정책*은 미학습 → 결함을 깨끗하게 시연·교정하기 좋음.
+- 왜 base(`-it` 없는)가 아닌가: base는 대화 정렬이 안 돼 있어 결함 비교의 기준선으로 부적합.
+- 코드: 노트북 **1장** `FastModel.from_pretrained("unsloth/gemma-4-E2B-it", ...)`.
+
+### Q2. 기존 모델에서 기대 결과가 안 나오는 것을 확인·기록했는가?
+**예 — 노트북 2장(Before)에서 확인하고, 7장에서 수치로 기록한다.**
+- **확인**: 동일한 소크라테스 시스템 지시(`SOCRATIC_SYS`)를 주고 3개 고정 질문(`PROBES`)을 던져, 모델이 **역질문 없이 정답/증명을 바로 설명**하는 출력을 그대로 출력·관찰(노트북 2장).
+- **기록**: 같은 `PROBES`로 **역질문률(SQR 근사)·정답누설율(ALR 근사)** 을 계산해 Before 값으로 남김(노트북 7장). After와 **동일 프롬프트·동일 지표**로 대조하므로 변화가 정량 기록된다.
+- 정밀 기록(IAR/SQR/ALR/RPS, McNemar/bootstrap)은 [`CASE_STUDY_scenario1_socratic.md`](CASE_STUDY_scenario1_socratic.md) §5–6.
+
+### Q3. 학습 데이터셋에서 입력·출력은 어떻게 정의되는가?
+원천: **`JosephLee/korean-socratic-qa`** (맥락 → 역질문). 통합 포맷으로 매핑(노트북 4장 `to_convo`):
+
+| 학습 필드 | 정의 | 채워지는 값 |
+|-----------|------|-------------|
+| **입력(user)** | 시나리오 지시 + 학생 질문/맥락 | `instruction`(소크라테스 지시) + `input`(맥락) |
+| **출력(assistant)** | 모델이 학습할 모범 답변 | `output` = **역질문/힌트** (정답 비노출) |
+
+```python
+user = ex['instruction'] + ('\n\n' + ex['input'] if ex['input'] else '')
+convo = [{'role':'user','content':user}, {'role':'assistant','content':ex['output']}]
+```
+- 핵심: 출력이 *정답이 아니라 역질문*이어야 한다. 그리고 **loss는 출력(assistant) 토큰에만** 준다(아래 Q4).
+- 베이스 능력 보존을 위해 `general`(KoAlpaca)을 소량 섞는다.
+
+### Q4. 학습 방법은 무엇을 할 것인가?
+**SFT(지도 미세조정) + LoRA**, 응답 토큰에만 손실.
+- **방법 종류**: SFT (←결함이 *정책*이므로). CPT/DPO/GRPO 아님(이유는 §2.2).
+- **적용 범위**: LoRA(본체 동결 + 어댑터). FFT 아님, 메모리·망각 이점.
+- **설정**: `FastModel.get_peft_model(r=8, finetune_language_layers=True, finetune_vision_layers=False)` → `SFTTrainer` → **`train_on_responses_only`** 로 user 부분 마스킹(=출력에만 loss). 코드: 노트북 3·5장.
+
+> 위 4문답이 채워지면 학습을 시작한다. 각 결정의 *대안/언제 바꾸나*는 아래 §2 내비게이션 참고.
+
+---
+
 ## 1. 결함 재현 (Before) — 무엇을 보는가
 
 같은 시스템 지시("정답 바로 주지 마")를 줘도, 소형 instruct 모델은 **즉답**한다.
