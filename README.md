@@ -28,6 +28,8 @@ Google Colab 무료 GPU에서 **소형 LLM을 교육용으로 파인튜닝**하�
 
 > 📖 각 기술을 **왜·언제·무엇을 조절하나(vibe learning)** 관점으로 정리한 학습 문서: **[docs/LEARNING.md](docs/LEARNING.md)**
 > — 입문자는 이 문서의 *큰 그림*과 *치트시트*부터 보세요.
+>
+> 🧩 시나리오를 **새로 만들거나 고를 때** 필요한 최소 정보·데이터셋 검색·등록 절차: **[docs/SCENARIO_GUIDE.md](docs/SCENARIO_GUIDE.md)**
 
 ---
 
